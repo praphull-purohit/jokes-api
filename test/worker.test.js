@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import worker, { weakEtag } from '../src/index.js';
-import { jokes, randomN, jokeById } from '../src/jokes.js';
+import { jokes, randomN, jokeById, count } from '../src/jokes.js';
 
 const HTML = 'text/html; charset=utf-8';
 const JSON_TYPE = 'application/json; charset=utf-8';
@@ -30,12 +30,12 @@ const contract = [
   ['/jokes/random/5', 200, JSON_TYPE, listOf(5)],
   ['/jokes/random/5/', 200, JSON_TYPE, listOf(5)],
   ['/jokes/random/5abc', 200, JSON_TYPE, listOf(5)],
-  ['/jokes/random/451', 200, JSON_TYPE, (body) => new Set(body.map((joke) => joke.id)).size === 451],
+  [`/jokes/random/${count}`, 200, JSON_TYPE, (body) => new Set(body.map((joke) => joke.id)).size === count],
   ['/jokes/random/-3', 200, JSON_TYPE, listOf(0)],
   ['/jokes/random/0', 200, HTML, text('The passed path is not a number.')],
   ['/jokes/random/abc', 200, HTML, text('The passed path is not a number.')],
   ['/jokes/random/random', 200, HTML, text('The passed path is not a number.')],
-  ['/jokes/random/452', 200, HTML, text('The passed path exceeds the number of jokes (451).')],
+  [`/jokes/random/${count + 1}`, 200, HTML, text(`The passed path exceeds the number of jokes (${count}).`)],
   ['/jokes/programming/random', 200, JSON_TYPE, listOf(1, (joke) => joke.type === 'programming')],
   ['/jokes/programming/ten', 200, JSON_TYPE, listOf(10, (joke) => joke.type === 'programming')],
   ['/jokes/knock%2Dknock/random', 200, JSON_TYPE, listOf(1, (joke) => joke.type === 'knock-knock')],
@@ -46,9 +46,9 @@ const contract = [
   ['/jokes/1.0', 200, JSON_TYPE, (body) => body.id === 1],
   ['/jokes/0x1', 200, JSON_TYPE, (body) => body.id === 1],
   ['/jokes/%31', 200, JSON_TYPE, (body) => body.id === 1],
-  ['/jokes/451', 200, JSON_TYPE, (body) => body.id === 451],
+  [`/jokes/${count}`, 200, JSON_TYPE, (body) => body.id === count],
   ['/jokes/0', 404, JSON_TYPE, (body) => body.message === 'joke not found'],
-  ['/jokes/452', 404, JSON_TYPE, (body) => body.message === 'joke not found'],
+  [`/jokes/${count + 1}`, 404, JSON_TYPE, (body) => body.message === 'joke not found'],
   ['/jokes/abc', 404, JSON_TYPE, (body) => body.message === 'joke not found'],
   ['/jokes/%E0', 400, JSON_TYPE, (body) => body.message === "Failed to decode param '%E0'"],
   ['/nope', 404, HTML, (body) => body.includes('<pre>Cannot GET /nope</pre>')],
@@ -143,7 +143,7 @@ test('randomN returns distinct items capped at the array length', () => {
 
 test('jokeById accepts only integer ids in range', () => {
   assert.equal(jokeById(1).punchline, 'Dam.');
-  for (const id of ['1', 'one', undefined, 0, 452, 1.5, NaN, -1]) {
+  for (const id of ['1', 'one', undefined, 0, count + 1, 1.5, NaN, -1]) {
     assert.equal(jokeById(id), undefined, String(id));
   }
 });
