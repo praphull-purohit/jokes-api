@@ -1,7 +1,7 @@
 {
-  "name": "official_joke_api",
+  "name": "jokes-api",
   "version": "1.0.0",
-  "description": "### Grab a random joke!",
+  "description": "Random joke API, served from Cloudflare Workers",
   "main": "src/index.js",
   "type": "module",
   "engines": {
@@ -14,15 +14,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/15Dkatz/official_joke_api.git"
+    "url": "git+https://github.com/praphull-purohit/jokes-api.git"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/15Dkatz/official_joke_api/issues"
+    "url": "https://github.com/praphull-purohit/jokes-api/issues"
   },
-  "homepage": "https://github.com/15Dkatz/official_joke_api#readme",
+  "homepage": "https://github.com/praphull-purohit/jokes-api#readme",
   "devDependencies": {
     "wrangler": "^4.163.0"
   }
